@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico - Metodologías de Cálculo de Pérdidas de Carga</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --elecnor-blue: #004687;
+            --elecnor-orange: #FF8200;
+            --bg-accent: #FFF8F2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .document-page {
+            max-width: 210mm;
+            margin: 20px auto;
+            background: white;
+            padding: 25mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-top: 10px solid var(--elecnor-blue);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--elecnor-orange);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo img { width: 180px; height: auto; }
+
+        .header-info {
+            text-align: right;
+            font-size: 11px;
+            color: var(--elecnor-blue);
+        }
+
+        h1 {
+            color: var(--elecnor-blue);
+            font-size: 18pt;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--elecnor-blue);
+            border-left: 5px solid var(--elecnor-orange);
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+        }
+
+        .impact-box {
+            background-color: var(--bg-accent);
+            border: 2px solid var(--elecnor-orange);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .formula {
+            display: block;
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            color: var(--elecnor-blue);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th {
+            background: var(--elecnor-blue);
+            color: white;
+            padding: 10px;
+        }
+
+        .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 11px;
+        }
+
+        footer {
+            margin-top: 50px;
+            border-top: 2px solid var(--elecnor-orange);
+            padding-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--elecnor-blue);
+            font-size: 10pt;
+        }
+
+        @media print {
+            body { background: none; }
+            .document-page { box-shadow: none; margin: 0; width: 100%; padding: 15mm; }
+            footer { position: fixed; bottom: 10mm; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="document-page">
+    <header>
+        <div class="logo">
+            <img src="logo1.png" alt="Elecnor Logo">
+        </div>
+        <div class="header-info">
+            <strong>Proyecto:</strong> <br>
+            <strong>Expediente:</strong> <br>
+            <strong>Fecha:</strong> 16 de febrero de 2026
+        </div>
+    </header>
+
+    <h1>Informe Técnico: Análisis del Exponente de Fricción en Sistemas Hidráulicos</h1>
+
+    <p>La utilización del exponente $1.852$ en la fórmula de pérdidas de carga ($H_f = K \cdot Q^{1.852}$) corresponde específicamente a la ecuación empírica de <strong>Hazen-Williams</strong>. Su aplicación es un estándar fundamental en ingeniería civil y de protección contra incendios, diferenciándose del modelo cuadrático de Darcy-Weisbach ($Q^2$).</p>
+
+    [Image of Moody chart vs Hazen-Williams friction factors]
+
+    <h2>1. Ámbito de Aplicación Normativo</h2>
+    <ul>
+        <li><strong>Protección Contra Incendios (PCI):</strong> Es el estándar obligado por la <strong>NFPA</strong> (especialmente NFPA 13 para rociadores) y el <strong>RIPCI</strong> (normas UNE-EN 12845). Los cálculos de redes de rociadores y BIEs se ejecutan bajo este exponente.</li>
+        <li><strong>Fontanería y Abastecimiento:</strong> Se utiliza en redes de agua potable de gran longitud y dimensionamiento urbano, bajo criterios del <strong>CTE DB-HS 4</strong> en España.</li>
+    </ul>
+
+    <h2>2. Condiciones Técnicas del Fluido y Limitaciones</h2>
+    <p>A diferencia del modelo universal de Darcy-Weisbach, Hazen-Williams presenta restricciones termodinámicas y reológicas:</p>
+    <ul>
+        <li><strong>Naturaleza del Fluido:</strong> Diseñada exclusivamente para agua.</li>
+        <li><strong>Temperatura:</strong> Precisa solo para agua entre $5^\circ\text{C}$ y $25^\circ\text{C}$. No debe emplearse en circuitos de calefacción o ACS debido a la variación de la viscosidad cinemática.</li>
+        <li><strong>Régimen:</strong> Válida para flujo turbulento en diámetros $> 50\text{ mm}$ y velocidades $\leq 3\text{ m/s}$.</li>
+    </ul>
+
+    <h2>3. Caracterización del Coeficiente de Resistencia $K$</h2>
+    <p>En este modelo, el valor de $K$ no depende del número de Reynolds ni de la rugosidad absoluta ($\varepsilon$), sino del <strong>Coeficiente de Rugosidad de Hazen-Williams ($C$)</strong>:</p>
+
+    <div class="formula">
+        $$K = \frac{10.67 \cdot L}{C^{1.852} \cdot D^{4.871}}$$
+    </div>
+
+    <div class="impact-box">
+        <strong>Referencia de Coeficientes $C$:</strong>
+        <ul>
+            <li><strong>C alto (140-150):</strong> Materiales lisos (PVC, Polietileno, Acero Inoxidable).</li>
+            <li><strong>C bajo (100-110):</strong> Materiales rugosos o envejecidos (Fundición, acero negro incrustado).</li>
+        </ul>
+    </div>
+
+    <h2>4. Impacto en la Curva de la Instalación</h2>
+    <p>Al graficar con $Q^{1.852}$, la parábola de la instalación es ligeramente menos pronunciada en caudales elevados en comparación con el modelo $Q^2$. En software de alta ingeniería (Epanet, CYPE), la selección del método es crítica, ya que desplaza el punto de funcionamiento real de la bomba.</p>
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Criterio</th>
+                <th>$Q^2$ (Darcy-Weisbach)</th>
+                <th>$Q^{1.852}$ (Hazen-Williams)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Uso recomendado</strong></td>
+                <td>Climatización, procesos, cualquier fluido.</td>
+                <td>PCI y abastecimiento de agua fría.</td>
+            </tr>
+            <tr>
+                <td><strong>Precisión</strong></td>
+                <td>Alta (considera viscosidad y temperatura).</td>
+                <td>Media/Alta (empírica, solo agua).</td>
+            </tr>
+            <tr>
+                <td><strong>Dependencia</strong></td>
+                <td>Número de Reynolds y Rugosidad relativa.</td>
+                <td>Coeficiente tabular $C$.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="impact-box" style="border-left: 5px solid var(--elecnor-blue);">
+        <strong>Resumen Pedagógico:</strong> Utilice $Q^2$ para ingeniería de procesos y térmica. Reserve el uso de $Q^{1.852}$ estrictamente para proyectos bajo normativa de aguas frías y protección contra incendios.
+    </div>
+
+  
+</div>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico - Regulación de Grupos de Presión</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --elecnor-blue: #004687; /* Pantone 294c */
+            --elecnor-orange: #FF8200; /* Pantone 1505c */
+            --bg-accent: #FFF8F2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .document-page {
+            max-width: 210mm;
+            margin: 20px auto;
+            background: white;
+            padding: 25mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-top: 10px solid var(--elecnor-blue);
+            position: relative;
+            min-height: 297mm;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--elecnor-orange);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo img {
+            width: 180px;
+            height: auto;
+        }
+
+        .header-info {
+            text-align: right;
+            font-size: 11px;
+            color: var(--elecnor-blue);
+            line-height: 1.4;
+        }
+
+        h1 {
+            color: var(--elecnor-blue);
+            font-size: 18pt;
+            text-align: center;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--elecnor-blue);
+            border-left: 5px solid var(--elecnor-orange);
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+        }
+
+        h3 {
+            color: var(--elecnor-blue);
+            font-size: 12pt;
+            border-bottom: 2px solid var(--elecnor-orange);
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .impact-box {
+            background-color: var(--bg-accent);
+            border: 2px solid var(--elecnor-orange);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 11px;
+        }
+
+        th {
+            background: var(--elecnor-blue);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        footer {
+            margin-top: 50px;
+            border-top: 2px solid var(--elecnor-orange);
+            padding-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--elecnor-blue);
+            font-size: 10pt;
+        }
+
+        @media print {
+            body { background: none; }
+            .document-page { 
+                box-shadow: none; 
+                margin: 0; 
+                width: 100%; 
+                padding: 15mm;
+            }
+            .impact-box { 
+                -webkit-print-color-adjust: exact; 
+                background-color: var(--bg-accent) !important; 
+            }
+            footer {
+                position: absolute;
+                bottom: 15mm;
+                width: calc(100% - 30mm);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="document-page">
+    <header>
+        <div class="logo">
+            <img src="logo1.png" alt="Elecnor Logo">
+        </div>
+        <div class="header-info">
+            <strong>Proyecto:</strong> Optimización de Sistemas de Abastecimiento DB-HS 4<br>
+            <strong>Expediente:</strong> Consulta Presiones Servicios<br>
+            <strong>Fecha:</strong> 16 de febrero de 2026
+        </div>
+    </header>
+
+    <h1>Informe Técnico: Regulación de Grupos de Presión y Vasos de Expansión</h1>
+
+    <p>Este informe técnico constituye una guía de referencia para el cálculo y ajuste de sistemas de abastecimiento de agua equipados con grupos de presión y vasos de expansión, conforme a la normativa vigente <strong>CTE DB-HS 4</strong> y la norma <strong>UNE 149201</strong>.</p>
+
+    <h2>1. Presiones de Funcionamiento (Bomba)</h2>
+    <p>Para optimizar la vida útil del motor y garantizar el confort del usuario final, las presiones de arranque y parada deben estar técnicamente equilibradas.</p>
+    
+    <ul>
+        <li><strong>Presión de Arranque ($P_{min}$):</strong> Es la presión mínima necesaria para garantizar el suministro en el punto de consumo más desfavorable (el más elevado o alejado) con la presión mínima exigida por el CTE ($100 \text{ kPa}$ en grifos comunes y $150 \text{ kPa}$ en fluxores).</li>
+        <li><strong>Presión de Parada ($P_{max}$):</strong> Límite superior de presión del sistema. Según el CTE, no debe exceder la presión nominal de los aparatos domésticos (típicamente $500 \text{ kPa}$) para prevenir daños en la grifería y fatiga en las conducciones.</li>
+    </ul>
+
+    <div class="impact-box">
+        <strong>Fórmula Práctica de Ajuste:</strong>
+        $$P_{max} = P_{min} + 1.5 \text{ bar}$$
+    </div>
+
+    <h2>2. Presión de Precarga del Vaso ($P_{gas}$)</h2>
+    <p>El vaso de expansión actúa amortiguando los cambios de presión y evitando ciclos de arranque/parada excesivos. El ajuste de la presión de aire debe realizarse obligatoriamente con el <strong>sistema hidráulico vacío y abierto a la atmósfera</strong>.</p>
+
+    <h3>Criterio Técnico</h3>
+    <p>La presión de precarga debe situarse ligeramente por debajo de la presión de arranque para asegurar una reserva útil de agua dentro de la membrana antes de que la bomba se active.</p>
+
+    <ul>
+        <li>Sistemas de agua fría: $P_{gas} = P_{min} - 0.2 \text{ bar}$</li>
+        <li>Sistemas de agua caliente (ACS): $P_{gas} = P_{min}$</li>
+    </ul>
+
+    <h2>3. Ejemplo de Aplicación</h2>
+    <p>Considerando una instalación con una presión de diseño de $3 \text{ bar}$ y un caudal determinado:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Parámetro</th>
+                <th>Valor de Ajuste</th>
+                <th>Justificación Técnica</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Presión de Arranque ($P_{min}$)</td>
+                <td>$3 \text{ bar}$</td>
+                <td>Garantiza los niveles de confort y cumplimiento de presión mínima en el punto crítico.</td>
+            </tr>
+            <tr>
+                <td>Presión de Parada ($P_{max}$)</td>
+                <td>$4.5 \text{ bar}$</td>
+                <td>Mantiene un diferencial óptimo de $1.5 \text{ bar}$ para la protección mecánica del motor.</td>
+            </tr>
+            <tr>
+                <td>Presión de Aire Vaso ($P_{gas}$)</td>
+                <td>$2.8 \text{ bar}$</td>
+                <td>Evita el colapso de la membrana y maximiza la capacidad de amortiguación.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>4. Consideraciones Técnicas Generales</h2>
+    <ul>
+        <li><strong>Frecuencia de Arranques:</strong> El volumen del vaso debe dimensionarse para limitar los ciclos a un rango de 15 a 20 arranques por hora.</li>
+        <li><strong>Ubicación:</strong> Se recomienda su instalación cerca del presostato para evitar fluctuaciones en la lectura de presión.</li>
+        <li><strong>Mantenimiento:</strong> Se debe verificar la precarga cada 6-12 meses, considerando una pérdida natural por micro-difusión de aproximadamente $0.1 \text{ bar/año}$.</li>
+        <li><strong>Seguridad:</strong> La presencia de agua en la válvula de aire indica una rotura de la membrana, requiriendo la sustitución inmediata del componente.</li>
+    </ul>
+
+    <footer>
+        Informe realizado por el Departamento de Reingeniería y Proyectos
+    </footer>
+</div>
+
+</body>
+</html>

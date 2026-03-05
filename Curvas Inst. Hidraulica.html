@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico - Caracterización y Cálculo de Sistemas Hidráulicos</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --elecnor-blue: #004687; /* Pantone 294c */
+            --elecnor-orange: #FF8200; /* Pantone 1505c */
+            --bg-accent: #FFF8F2;
+            --text-color: #333333;
+        }
+
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        .document-container {
+            max-width: 210mm;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            border-top: 8px solid var(--elecnor-blue);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--elecnor-orange);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            max-width: 180px;
+            height: auto;
+        }
+
+        .meta-data {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--elecnor-blue);
+        }
+
+        .meta-data p { margin: 2px 0; }
+
+        h1 {
+            color: var(--elecnor-blue);
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 40px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            color: var(--elecnor-blue);
+            font-size: 1.4rem;
+            border-left: 5px solid var(--elecnor-orange);
+            padding-left: 15px;
+            margin-top: 35px;
+            background: #f9f9f9;
+        }
+
+        h3 {
+            color: var(--elecnor-blue);
+            font-size: 1.1rem;
+            margin-top: 25px;
+            text-decoration: underline;
+            text-underline-offset: 5px;
+        }
+
+        .formula-box {
+            background-color: var(--bg-accent);
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid var(--elecnor-orange);
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .technical-note {
+            font-style: italic;
+            background: #f4f7fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            font-size: 0.95rem;
+            border: 1px solid #d1d9e0;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: var(--elecnor-blue);
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* Estilos para impresión y PDF */
+        @media print {
+            body { background: white; }
+            .document-container {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                max-width: none;
+                padding: 10mm;
+            }
+            header { page-break-inside: avoid; }
+            h2, h3 { page-break-after: avoid; }
+            .formula-box { page-break-inside: avoid; }
+            footer {
+                position: fixed;
+                bottom: 10mm;
+                left: 0;
+                right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="document-container">
+    <header>
+        <div class="logo-container">
+            <img src="logo1.png" alt="Logotipo Corporativo">
+        </div>
+        <div class="meta-data">
+            <p><strong>Título:</strong> Curvas Sistemas Hidráulicos</p>
+            <p><strong>Proyecto:</strong> Hidráulica bombas</p>
+            <p><strong>Expediente:</strong> Curvas Bombas</p>
+            <p><strong>Fecha:</strong> 16 de febrero de 2026</p>
+        </div>
+    </header>
+
+    <h1>Informe Técnico: Caracterización y Cálculo de Sistemas Hidráulicos</h1>
+
+    <p>Este informe detalla la metodología técnica para definir las curvas de la instalación y las diferentes configuraciones de bombeo (simple, paralelo y serie), fundamentales para el diseño de sistemas de filtración y transporte de fluidos con precisión de ingeniería.</p>
+
+    
+
+    <h2>1. La Curva del Sistema (La Demanda)</h2>
+    <p>La curva de la instalación representa la energía que el sistema exige para mover un caudal determinado. Su ecuación fundamental es:</p>
+    
+    <div class="formula-box">
+        $$H_{inst} = (H_g + P_{res}) + k_{sys} \cdot Q^2$$
+    </div>
+
+    <ul>
+        <li><span class="highlight">Altura Estática Total ($H_e = H_g + P_{res}$):</span> Es la suma del desnivel físico ($H_g$) y la presión residual mínima requerida ($P_{res}$). Define el punto de inicio de la curva en el eje vertical (caudal cero).</li>
+        <li><span class="highlight">Constante de Resistencia ($k_{sys}$):</span> Se obtiene mediante la relación entre las pérdidas dinámicas nominales ($H_f$) y el cuadrado del caudal de diseño ($Q_{dis}$):
+            $$k_{sys} = \frac{H_f}{Q_{dis}^2}$$
+        </li>
+    </ul>
+
+    <h2>2. La Curva de la Bomba (La Capacidad)</h2>
+    <p>La curva de una bomba centrífuga define su capacidad de entrega de energía. Se modela matemáticamente como una parábola descendente:</p>
+
+    <div class="formula-box">
+        $$H_{bomba} = H_0 - k_{pump} \cdot Q^2$$
+    </div>
+
+    <ul>
+        <li><span class="highlight">Altura de Cierre ($H_0$):</span> Máxima presión alcanzada por la bomba a caudal cero (Shut-off head).</li>
+        <li><span class="highlight">Coeficiente de Pérdida Interna ($k_{pump}$):</span> Parámetro calculado a partir del punto nominal de catálogo ($H_{nom}$, $Q_{nom}$):
+            $$k_{pump} = \frac{H_0 - H_{nom}}{Q_{nom}^2}$$
+        </li>
+    </ul>
+
+    <h2>3. Configuraciones de Bombeo Combinado</h2>
+    <p>Para sistemas que requieren mayor capacidad volumétrica o redundancia de presión, se emplean configuraciones en paralelo o en serie.</p>
+
+    <h3>A. Bombas en Paralelo (Suma de Caudales)</h3>
+    <p>Configuración donde las bombas comparten colectores de aspiración e impulsión.</p>
+    <ul>
+        <li><strong>Ecuación:</strong> $$H_{paralelo} = H_0 - k_{pump} \cdot \left(\frac{Q}{2}\right)^2$$</li>
+        <li><strong>Efecto:</strong> La curva se expande horizontalmente. A igual presión, el sistema ofrece el doble de caudal teórico.</li>
+        <li><strong>Uso:</strong> Ideal para sistemas con curvas de instalación planas (baja resistencia dinámica) como el filtrado de piscinas de gran volumen.</li>
+    </ul>
+
+    <h3>B. Bombas en Serie (Suma de Presiones)</h3>
+    <p>Configuración donde la impulsión de una bomba alimenta directamente la aspiración de la siguiente.</p>
+    <ul>
+        <li><strong>Ecuación:</strong> $$H_{serie} = 2 \cdot (H_0 - k_{pump} \cdot Q^2)$$</li>
+        <li><strong>Efecto:</strong> La curva se desplaza verticalmente. Se duplica la presión disponible para un mismo caudal.</li>
+        <li><strong>Uso:</strong> Necesario en instalaciones con gran altura geométrica o filtros de alta resistencia donde una sola unidad es insuficiente.</li>
+    </ul>
+
+    <h2>4. Cálculo del Punto de Funcionamiento Real</h2>
+    <p>El equilibrio del sistema se halla resolviendo la intersección analítica entre la curva del sistema y la curva de la configuración elegida. El caudal real obtenido ($Q$) se calcula mediante las siguientes expresiones:</p>
+
+    <div class="formula-box">
+        <p><strong>Bomba Simple:</strong> $Q = \sqrt{\frac{H_0 - H_{est}}{k_{sys} + k_{pump}}}$</p>
+        <p><strong>En Paralelo:</strong> $Q = \sqrt{\frac{H_0 - H_{est}}{k_{sys} + \frac{k_{pump}}{4}}}$</p>
+        <p><strong>En Serie:</strong> $Q = \sqrt{\frac{2 \cdot H_0 - H_{est}}{k_{sys} + 2 \cdot k_{pump}}}$</p>
+    </div>
+
+    <div class="technical-note">
+        <strong>Nota Técnica Final:</strong> En una instalación real, el aumento de caudal en paralelo nunca es exactamente el doble del de una bomba simple. Esto se debe a que al aumentar el flujo, las pérdidas de carga del sistema ($k_{sys} \cdot Q^2$) crecen de forma cuadrática, desplazando el punto de equilibrio hacia zonas de mayor presión y menor eficiencia individual por bomba.
+    </div>
+
+    <footer>
+        Informe realizado por el Departamento de Reingeniería y Proyectos
+    </footer>
+</div>
+
+</body>
+</html>
