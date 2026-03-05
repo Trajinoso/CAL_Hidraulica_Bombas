@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Avanzado de Bombas - Elecnor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- ESTILOS CORPORATIVOS --- */
+        :root {
+            --corp-blue: #003087;
+            --corp-blue-light: #e6effd;
+            --corp-orange: #F58220;
+            --corp-bg-light: #f0f4fa;
+            --text-color: #333;
+            --border-color: #e2e8f0;
+            --accent-green: #10b981; /* Paralelo */
+            --accent-pink: #ec4899;  /* Serie */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--corp-bg-light);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 48, 135, 0.1);
+            border-top: 6px solid var(--corp-orange);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        header h1 { margin: 0; color: var(--corp-blue); font-size: 1.5rem; }
+        header p { margin: 5px 0 0; color: #64748b; font-size: 0.9rem; }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 80vh;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            background: #f8fafc;
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .control-group h3 {
+            margin-top: 0; margin-bottom: 12px;
+            font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--corp-blue);
+            border-bottom: 2px solid var(--corp-orange);
+            padding-bottom: 5px; display: inline-block;
+        }
+
+        .input-row { margin-bottom: 12px; }
+        label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 4px; }
+        
+        input[type="number"] {
+            width: 100%; padding: 8px 10px;
+            border: 1px solid #cbd5e1; border-radius: 6px;
+            font-family: monospace; font-size: 0.9rem; color: var(--corp-blue);
+            box-sizing: border-box; transition: border 0.2s;
+        }
+        input[type="number"]:focus { outline: none; border-color: var(--corp-orange); background: #fffbf7; }
+
+        /* --- BOTONES DE SELECCIÓN DE N --- */
+        .n-selector {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .n-btn {
+            flex: 1;
+            padding: 6px 0;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #64748b;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .n-btn.active {
+            background: var(--corp-blue);
+            color: white;
+            border-color: var(--corp-blue);
+        }
+        .n-btn:hover:not(.active) { background: #f1f5f9; }
+
+        /* Color variants for buttons based on context */
+        .group-parallel .n-btn.active { background: var(--accent-green); border-color: var(--accent-green); }
+        .group-series .n-btn.active { background: var(--accent-pink); border-color: var(--accent-pink); }
+
+        /* --- TOGGLES --- */
+        .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; cursor: pointer; user-select: none; }
+        .toggle-row input { cursor: pointer; accent-color: var(--corp-blue); width: 16px; height: 16px; }
+        .toggle-row span { font-size: 0.9rem; color: #334155; }
+
+        /* --- RESULTADOS --- */
+        .chart-area { padding: 20px; display: flex; flex-direction: column; background: #fff; }
+        
+        .results-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            padding: 12px; border-radius: 6px; background: white;
+            border-left: 4px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #eee; border-left-width: 4px;
+        }
+        .badge h4 { margin: 0 0 5px 0; font-size: 0.75rem; text-transform: uppercase; color: #64748b; }
+        .badge .value { font-family: monospace; font-size: 1rem; color: #1e293b; font-weight: bold; }
+        .badge .sub { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        
+        .badge.sys { border-left-color: var(--corp-orange); }
+        .badge.simple { border-left-color: #38bdf8; }
+        .badge.parallel { border-left-color: var(--accent-green); }
+        .badge.series { border-left-color: var(--accent-pink); }
+
+        .formulas { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .formula-tag {
+            font-family: monospace; font-size: 0.75rem; background: #f8fafc;
+            padding: 4px 8px; border-radius: 4px; color: #475569; border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+            .sidebar { max-height: none; border-right: none; border-bottom: 1px solid var(--border-color); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div style="width:40px;height:40px;background:linear-gradient(135deg, var(--corp-blue), #4c7bd9);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:1.2rem;">⚙</div>
+        <div>
+            <h1>Simulador de Grupos de Bombeo</h1>
+            <p>Análisis de punto de trabajo con N bombas en serie o paralelo</p>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <aside class="sidebar">
+            
+            <div class="control-group">
+                <h3>Curva del Sistema</h3>
+                <div class="input-row">
+                    <label>H. Geométrica (Hg) [m]</label>
+                    <input type="number" id="H_g" value="6.00" step="0.1" oninput="updateChart()">
+                </div>
+                <div class="input-row">
+                    <label>Presión Residual (Pres) [m]</label>
+                    <input type="number" id="P_res" value="7.14" step="0.1" oninput="updateChart()">
+                </div>
+                <div class="input-row">
+                    <label>Pérdidas (Hf) a Q_dis [m]</label>
+                    <input type="number" id="H_f" value="7.43" step="0.1" oninput="updateChart()">
+                </div>
+                <div class="input-row">
+                    <label>Caudal diseño (Q_dis) [m³/h]</label>
+                    <input type="number" id="Q_dis" value="60" step="1" oninput="updateChart()">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Bomba Unitaria</h3>
+                <div class="input-row">
+                    <label>H₀ (Cierre) [m]</label>
+                    <input type="number" id="H0" value="26" step="0.5" oninput="updateChart()">
+                </div>
+                <div class="input-row">
+                    <label>H nominal [m]</label>
+                    <input type="number" id="H_nom" value="20" step="0.5" oninput="updateChart()">
+                </div>
+                <div class="input-row">
+                    <label>Q nominal [m³/h]</label>
+                    <input type="number" id="Q_nom" value="30" step="1" oninput="updateChart()">
+                </div>
+            </div>
+
+            <div class="control-group group-parallel">
+                <div class="toggle-row">
+                    <input type="checkbox" id="show_parallel" checked onchange="updateChart()">
+                    <span style="color:var(--accent-green); font-weight:bold;">Bombas en Paralelo</span>
+                </div>
+                <label>Número de bombas (N):</label>
+                <div class="n-selector" id="btn-group-par">
+                    <button class="n-btn" onclick="setN('par', 1)">1</button>
+                    <button class="n-btn active" onclick="setN('par', 2)">2</button>
+                    <button class="n-btn" onclick="setN('par', 3)">3</button>
+                    <button class="n-btn" onclick="setN('par', 4)">4</button>
+                </div>
+            </div>
+
+            <div class="control-group group-series">
+                <div class="toggle-row">
+                    <input type="checkbox" id="show_series" checked onchange="updateChart()">
+                    <span style="color:var(--accent-pink); font-weight:bold;">Bombas en Serie</span>
+                </div>
+                <label>Número de bombas (N):</label>
+                <div class="n-selector" id="btn-group-ser">
+                    <button class="n-btn" onclick="setN('ser', 1)">1</button>
+                    <button class="n-btn active" onclick="setN('ser', 2)">2</button>
+                    <button class="n-btn" onclick="setN('ser', 3)">3</button>
+                    <button class="n-btn" onclick="setN('ser', 4)">4</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Visualización</h3>
+                <div class="input-row">
+                    <label>Eje X Máximo (Q) [m³/h]</label>
+                    <input type="number" id="Q_max" value="150" step="10" oninput="updateChart()">
+                </div>
+                <div class="toggle-row">
+                    <input type="checkbox" id="show_sys" checked onchange="updateChart()">
+                    <span>Ver Sistema</span>
+                </div>
+                <div class="toggle-row">
+                    <input type="checkbox" id="show_simple" checked onchange="updateChart()">
+                    <span>Ver 1 Bomba Simple</span>
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="chart-area">
+            <div class="results-bar" id="resultsContainer"></div>
+
+            <div style="flex:1; position:relative; min-height:400px;">
+                <canvas id="pumpChart"></canvas>
+            </div>
+
+            <div class="formulas" id="formulasContainer">
+                </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    /* ─── LÓGICA DE NEGOCIO (Matemáticas) ─── */
+
+    let chartInstance = null;
+    
+    // Estado global de N
+    let state = {
+        n_paralelo: 2,
+        n_serie: 2
+    };
+
+    // Colores
+    const C = {
+        sys: "#F58220",
+        simple: "#38bdf8",
+        par: "#10b981",
+        ser: "#ec4899"
+    };
+
+    // Funciones Helper
+    const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+    
+    // Función para botones N
+    function setN(type, val) {
+        if(type === 'par') state.n_paralelo = val;
+        if(type === 'ser') state.n_serie = val;
+
+        // Actualizar UI botones
+        document.querySelectorAll(`#btn-group-${type} .n-btn`).forEach(b => b.classList.remove('active'));
+        // El botón clickeado no lo tengo directamente aquí, busco por texto o índice
+        // Truco simple: seleccionar por orden (val-1)
+        document.querySelectorAll(`#btn-group-${type} .n-btn`)[val-1].classList.add('active');
+
+        updateChart();
+    }
+
+    // Cálculos de Coeficientes K
+    function calcK_sistema(H_f, Q_dis) {
+        if (Q_dis <= 0) return 0;
+        return H_f / (Q_dis * Q_dis);
+    }
+
+    function calcK_bomba(H0, H_nom, Q_nom) {
+        if (Q_nom <= 0 || H0 <= H_nom) return 0.001;
+        return (H0 - H_nom) / (Q_nom * Q_nom);
+    }
+
+    /* ─── INTERSECCIONES ─── */
+    
+    // Intersección N bombas PARALELO con sistema
+    // H_sis = H_est + k_sys * Q^2
+    // H_bombas = H0 - k_pump * (Q/N)^2
+    function intersectParN(H_est, k_sys, H0, k_pump, N, Qmax) {
+        const denom = k_sys + k_pump / (N * N);
+        if (denom <= 0) return null;
+        const Q2 = (H0 - H_est) / denom;
+        if (Q2 <= 0) return null;
+        const Q = Math.sqrt(Q2);
+        const H = H_est + k_sys * Q2;
+        if (Q > Qmax * 1.5) return null; // Fuera de rango razonable
+        return { Q, H };
+    }
+
+    // Intersección N bombas SERIE con sistema
+    // H_sis = H_est + k_sys * Q^2
+    // H_bombas = N * (H0 - k_pump * Q^2) = N*H0 - N*k_pump*Q^2
+    function intersectSerN(H_est, k_sys, H0, k_pump, N, Qmax) {
+        const denom = k_sys + N * k_pump;
+        if (denom <= 0) return null;
+        const Q2 = (N * H0 - H_est) / denom;
+        if (Q2 <= 0) return null;
+        const Q = Math.sqrt(Q2);
+        const H = H_est + k_sys * Q2;
+        if (Q > Qmax * 1.5) return null;
+        return { Q, H };
+    }
+
+    // Intersección Simple (caso N=1)
+    function intersectSimple(H_est, k_sys, H0, k_pump, Qmax) {
+        return intersectParN(H_est, k_sys, H0, k_pump, 1, Qmax);
+    }
+
+    /* ─── ACTUALIZACIÓN Y RENDERIZADO ─── */
+    function updateChart() {
+        // 1. Obtener Inputs
+        const p = {
+            H_g: getVal('H_g'),
+            P_res: getVal('P_res'),
+            H_f: getVal('H_f'),
+            Q_dis: getVal('Q_dis'),
+            H0: getVal('H0'),
+            H_nom: getVal('H_nom'),
+            Q_nom: getVal('Q_nom'),
+            Q_max: getVal('Q_max')
+        };
+
+        const show = {
+            sys: document.getElementById('show_sys').checked,
+            simple: document.getElementById('show_simple').checked,
+            parallel: document.getElementById('show_parallel').checked,
+            series: document.getElementById('show_series').checked,
+        };
+
+        // 2. Calcular Constantes
+        const H_est = p.H_g + p.P_res;
+        const k_sys = calcK_sistema(p.H_f, p.Q_dis);
+        const k_pump = calcK_bomba(p.H0, p.H_nom, p.Q_nom);
+        
+        // Calcular Puntos de Trabajo
+        const ptS = intersectSimple(H_est, k_sys, p.H0, k_pump, p.Q_max);
+        const ptP = intersectParN(H_est, k_sys, p.H0, k_pump, state.n_paralelo, p.Q_max);
+        const ptSer = intersectSerN(H_est, k_sys, p.H0, k_pump, state.n_serie, p.Q_max);
+
+        // 3. Generar Datos (Arrays)
+        const steps = 100;
+        const labels = [];
+        const d_sys=[], d_simple=[], d_par=[], d_ser=[];
+
+        for (let i = 0; i <= steps; i++) {
+            const Q = (i / steps) * p.Q_max;
+            labels.push(Q.toFixed(1));
+            const Q2 = Q*Q;
+
+            // Sistema
+            if (show.sys) d_sys.push(H_est + k_sys * Q2);
+
+            // Simple
+            if (show.simple) {
+                const h = p.H0 - k_pump * Q2;
+                d_simple.push(h > 0 ? h : null);
+            }
+
+            // Paralelo N
+            if (show.parallel) {
+                // H = H0 - k * (Q/N)^2
+                const h = p.H0 - k_pump * ((Q/state.n_paralelo)**2);
+                d_par.push(h > 0 ? h : null);
+            }
+
+            // Serie N
+            if (show.series) {
+                // H = N * (H0 - k * Q^2)
+                const h_single = p.H0 - k_pump * Q2;
+                const h = h_single * state.n_serie;
+                d_ser.push(h_single > 0 ? h : null);
+            }
+        }
+
+        // 4. Actualizar Resultados HTML (Badges)
+        const resBox = document.getElementById('resultsContainer');
+        resBox.innerHTML = '';
+
+        if(show.sys) {
+            const H_design = H_est + k_sys * (p.Q_dis**2);
+            resBox.innerHTML += `
+            <div class="badge sys">
+                <h4>Requerimiento (Diseño)</h4>
+                <div class="value">${p.Q_dis.toFixed(1)} m³/h</div>
+                <div class="value" style="font-size:0.9em;color:#666">${H_design.toFixed(2)} m.c.a.</div>
+                <div class="sub">H_geo: ${H_est.toFixed(2)}m</div>
+            </div>`;
+        }
+        
+        if (show.simple && ptS) {
+            resBox.innerHTML += `
+            <div class="badge simple">
+                <h4>1 Bomba</h4>
+                <div class="value">${ptS.Q.toFixed(2)} m³/h</div>
+                <div class="value" style="font-size:0.9em;color:#666">${ptS.H.toFixed(2)} m.c.a.</div>
+            </div>`;
+        }
+
+        if (show.parallel && ptP) {
+            resBox.innerHTML += `
+            <div class="badge parallel">
+                <h4>${state.n_paralelo} en Paralelo</h4>
+                <div class="value">${ptP.Q.toFixed(2)} m³/h</div>
+                <div class="value" style="font-size:0.9em;color:#666">${ptP.H.toFixed(2)} m.c.a.</div>
+                ${state.n_paralelo > 1 ? `<div class="sub">C/u: ${(ptP.Q/state.n_paralelo).toFixed(1)} m³/h</div>` : ''}
+            </div>`;
+        }
+
+        if (show.series && ptSer) {
+            resBox.innerHTML += `
+            <div class="badge series">
+                <h4>${state.n_serie} en Serie</h4>
+                <div class="value">${ptSer.Q.toFixed(2)} m³/h</div>
+                <div class="value" style="font-size:0.9em;color:#666">${ptSer.H.toFixed(2)} m.c.a.</div>
+                ${state.n_serie > 1 ? `<div class="sub">C/u: ${(ptSer.H/state.n_serie).toFixed(1)} mca</div>` : ''}
+            </div>`;
+        }
+
+        // 5. Actualizar Fórmulas Footer
+        const formulasDiv = document.getElementById('formulasContainer');
+        formulasDiv.innerHTML = `
+            <div class="formula-tag" style="color:${C.sys};border-color:${C.sys}">Sys: H = ${(p.H_g+p.P_res).toFixed(2)} + ${k_sys.toFixed(4)}·Q²</div>
+            <div class="formula-tag" style="color:${C.simple};border-color:${C.simple}">1B: H = ${p.H0} - ${k_pump.toFixed(4)}·Q²</div>
+            <div class="formula-tag" style="color:${C.par};border-color:${C.par}">Par(${state.n_paralelo}): H = ${p.H0} - ${k_pump.toFixed(4)}·(Q/${state.n_paralelo})²</div>
+            <div class="formula-tag" style="color:${C.ser};border-color:${C.ser}">Ser(${state.n_serie}): H = ${state.n_serie}·(${p.H0} - ${k_pump.toFixed(4)}·Q²)</div>
+        `;
+
+
+        // 6. Chart.js Config
+        const datasets = [];
+
+        // Puntos de trabajo (Scatter)
+        const commonPoint = { radius: 6, hoverRadius: 8, borderWidth: 2, borderColor: '#fff' };
+
+        if(show.sys) {
+             // Punto de Diseño
+             datasets.push({
+                type: 'scatter', label: 'Punto Diseño',
+                data: [{x: p.Q_dis, y: H_est + k_sys * (p.Q_dis**2)}],
+                backgroundColor: 'white', borderColor: C.sys, borderWidth:2, radius: 5
+            });
+            // Línea Sistema
+            datasets.push({
+                type: 'line', label: 'Curva Sistema', data: d_sys,
+                borderColor: C.sys, borderDash: [5,5], borderWidth: 2, pointRadius: 0, fill: false, tension:0.4
+            });
+        }
+
+        if(show.simple) {
+            if(ptS) datasets.push({ type: 'scatter', label: 'Op 1 Bomba', data: [{x:ptS.Q, y:ptS.H}], backgroundColor: C.simple, ...commonPoint });
+            datasets.push({ type: 'line', label: 'Curva 1 Bomba', data: d_simple, borderColor: C.simple, borderWidth: 2, pointRadius: 0, tension:0.4 });
+        }
+
+        if(show.parallel) {
+            if(ptP) datasets.push({ type: 'scatter', label: `Op ${state.n_paralelo} Paralelo`, data: [{x:ptP.Q, y:ptP.H}], backgroundColor: C.par, ...commonPoint });
+            datasets.push({ type: 'line', label: `Curva ${state.n_paralelo} Paralelo`, data: d_par, borderColor: C.par, borderWidth: 2, pointRadius: 0, tension:0.4 });
+        }
+
+        if(show.series) {
+            if(ptSer) datasets.push({ type: 'scatter', label: `Op ${state.n_serie} Serie`, data: [{x:ptSer.Q, y:ptSer.H}], backgroundColor: C.ser, ...commonPoint });
+            datasets.push({ type: 'line', label: `Curva ${state.n_serie} Serie`, data: d_ser, borderColor: C.ser, borderWidth: 2, pointRadius: 0, tension:0.4 });
+        }
+
+        // Render
+        const ctx = document.getElementById('pumpChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(ctx, {
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 20 } },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 48, 135, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        callbacks: {
+                            label: (ctx) => {
+                                let val = ctx.raw.y !== undefined ? ctx.raw.y : ctx.raw;
+                                return `${ctx.dataset.label}: ${val.toFixed(2)} m.c.a.`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Caudal Q (m³/h)', color: '#64748b' },
+                        grid: { color: '#f1f5f9' },
+                        ticks: { maxTicksLimit: 10 }
+                    },
+                    y: {
+                        title: { display: true, text: 'Altura H (m.c.a.)', color: '#64748b' },
+                        grid: { color: '#f1f5f9' },
+                        min: 0
+                    }
+                }
+            }
+        });
+    }
+
+    // Inicializar
+    window.onload = updateChart;
+
+</script>
+
+</body>
+</html>
