@@ -1,0 +1,19 @@
+Crea un artefacto React interactivo para calcular puntos de trabajo de bombas hidráulicas:
+
+INPUTS:
+- Sistema: H_geometrica, P_residual, H_perdidas, Q_diseño → calcula k automático
+- Bomba: H0 (cierre), H_nominal, Q_nominal → calcula k automático
+- Selectores: N bombas (1-4) en paralelo y serie
+
+GRÁFICO (Recharts):
+- 4 curvas: sistema, simple, N paralelo, N serie
+- Puntos de intersección con coordenadas
+- Tooltips, toggles, línea Q_diseño
+
+OUTPUTS:
+- Puntos de trabajo (Q, H) con desglose por bomba
+- Fórmulas dinámicas según N seleccionado
+- Pills de valores calculados
+
+DEFAULTS: H_g=6, P_res=7.14, H_f=7.43, Q_dis=60, H0=26, H_nom=20, Q_nom=30
+TEMA: Oscuro, colores ámbar/cyan/verde/rosa, panel lateral 275px
